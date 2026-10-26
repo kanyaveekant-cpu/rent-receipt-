@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ใบเสร็จรับเงินค่าเช่า</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#e9eee8;--surface:#fff;--ink:#1d2a1d;--muted:#5f6d5f;--line:#cdd6cb;--accent:#2f4f1f;--accent-ink:#fff;--ok:#1d7a3a;--danger:#b3372f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121712;--surface:#1b231b;--ink:#e6ede6;--muted:#9aa89a;--line:#2e3a2e;--accent:#8fbf7a;--accent-ink:#10200a;--ok:#6fd08a;--danger:#ef877f}}
+:root[data-theme="dark"]{--bg:#121712;--surface:#1b231b;--ink:#e6ede6;--muted:#9aa89a;--line:#2e3a2e;--accent:#8fbf7a;--accent-ink:#10200a;--ok:#6fd08a;--danger:#ef877f}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Noto Sans Thai Looped","Sarabun",system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:16px}
+h1{font-size:1.4rem;margin:8px 0 14px}
+h2,summary{font-size:1.05rem;font-weight:700}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tabs button{flex:1;padding:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;font:inherit;font-weight:600;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}}
+.full{grid-column:1/-1}
+.h2{grid-column:span 2}
+label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:3px}
+input,select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.group{grid-column:1/-1;font-weight:700;margin-top:6px;padding-top:10px;border-top:1px solid var(--line)}
+.group:first-child{border-top:0;margin-top:0;padding-top:0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.btn{padding:11px 16px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:600;cursor:pointer}
+.btn.alt{background:transparent;color:var(--accent)}
+.btn.del{background:transparent;color:var(--danger);border-color:var(--danger);padding:6px 10px;font-size:.85rem}
+#fit{width:100%;overflow:hidden;border:1px solid var(--line);border-radius:6px;background:#fff}
+/* receipt: fixed A4 landscape, scaled to fit screen */
+.rc{position:relative;width:148mm;height:105mm;background:#fff;color:#111;font-size:10.5px;line-height:1.5;padding:12px 44px 12px 24px;display:flex;flex-direction:column;justify-content:center;transform-origin:top left;overflow:hidden}
+.rc b{font-weight:700}
+.rc .top{margin-bottom:8px}
+.rc .mid{display:flex;justify-content:space-between;gap:12px;padding-bottom:6px}
+.rc .rt{text-align:right}
+.rc .rt span{margin:0 10px 0 5px}
+.rc .rt span:last-child{margin-right:0}
+.rc table{width:100%;table-layout:fixed;border-collapse:collapse;border-top:1px solid #111;border-bottom:1px solid #111}
+.rc th{padding:3px 2px;line-height:1.3;font-size:10px;border-bottom:1px solid #111;font-weight:700}
+.rc td{padding:0 2px;text-align:center}
+.rc .l{text-align:left}.rc .r{text-align:right}
+.rc tfoot td{border-top:1px solid #111;font-weight:700}
+.rc .ft{display:flex;justify-content:space-between;margin-top:10px}
+.rc .ft span{margin:0 14px 0 6px}
+.rc .sg{text-align:center;width:130px;margin-top:-4px;line-height:1.4}
+.rc .sg img{display:block;margin:0 auto;max-height:30px;max-width:84px}
+.rc .sg div{border-top:1px solid #111;padding-top:2px;margin-top:2px}
+.rc .bar{position:absolute;right:0;top:0;bottom:0;width:20px;background:#2f4f1f;color:#fff;font-weight:700;font-size:9px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.rc .bar span{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(90deg);white-space:nowrap}
+.hist{list-style:none;margin:0;padding:0}
+.hist li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
+.hist li:first-child{border-top:0}
+.hist .open{background:none;border:0;color:var(--ink);font:inherit;text-align:left;cursor:pointer;flex:1}
+.hist small{color:var(--muted);display:block}
+.empty{color:var(--muted);text-align:center;padding:16px 0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+.hidden{display:none}
+@page{size:148mm 105mm;margin:0}
+@media print{:root{padding:0}body{background:#fff}main{padding:0;max-width:none}main>*:not(#view-new){display:none!important}#view-new>*:not(#fit){display:none!important}#fit{height:auto!important;border:0;border-radius:0;overflow:visible}.rc{transform:none!important}.toast{display:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>ใบเสร็จรับเงินค่าเช่า</h1>
+<div class="tabs" role="tablist">
+  <button role="tab" id="tabNew" aria-selected="true">ออกใบเสร็จ</button>
+  <button role="tab" id="tabHist" aria-selected="false">ประวัติ</button>
+</div>
+
+<section id="view-new">
+  <details class="panel" id="profile">
+    <summary>ข้อมูลผู้ให้เช่า (กรอกครั้งเดียว ระบบจำไว้)</summary>
+    <div class="grid" id="pGrid"></div>
+  </details>
+  <div class="panel"><div class="grid" id="rGrid"></div></div>
+  <div id="fit"><div class="rc" id="receipt"></div></div>
+  <div class="actions">
+    <button class="btn" id="save">บันทึกใบเสร็จ</button>
+    <button class="btn alt" id="dlPdf">ดาวน์โหลด PDF</button>
+    <button class="btn alt" id="dlPng">ดาวน์โหลดรูป PNG</button>
+    <button class="btn alt" id="print">พิมพ์</button>
+    <button class="btn alt" id="reset">ใบใหม่</button>
+  </div>
+  <p id="status" role="status" style="text-align:center;font-weight:600;min-height:1.5em;margin:10px 0 0"></p>
+</section>
+
+<section id="view-hist" class="hidden">
+  <div class="panel"><h2 style="margin:0 0 8px">ใบเสร็จที่บันทึกไว้</h2><ul class="hist" id="histList"></ul></div>
+</section>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const HOUSES=['บ้านเพียงพอ (ห้องแถวไฟฟ้า)','บ้านรื่นรม (ยายเป็ง หลัง)','บ้านร่ำรวย (ยายเป็ง หน้า)','บ้านสุขใจ (ยายผง)','บ้านเป็นสุข (หลังใหญ่)','บ้านอยู่เย็น (ข้างเป็นสุข)','บ้านอุ่นกาย (ป่าคา1)','บ้านสบายใจ (ป่าคา2)','บ้านเดี่ยว'];
+const METHODS=['เงินโอน','เงินสด','พร้อมเพย์'];
+const RF=['flat','house','room','hAddr','issueDate','paidDate','tName','tAddr','tTax','rent','wPrev','wCurr','wRate','wMin','ePrev','eCurr','eRate','eMin','gRate','oName','oAmt','method','rcvName','note'];
+const PF=['lName','lOwner','lAddr','lTax','bank'];
+const DEF={wRate:20,wMin:100,eRate:10,eMin:100,gRate:20};
+const DEFP={};
+const HK='rentReceipts.v2',PK='rentProfile.v2';
+let history=[],P={houses:{},logo:'',sign:''},currentNo='';
+
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>'฿'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=id=>Math.max(0,parseFloat($(id).value)||0);
+const val=id=>$(id).value.trim();
+const okImg=s=>typeof s==='string'&&s.startsWith('data:image/');
+function thDate(v){if(!v)return '';const [y,m,d]=v.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('th-TH',{day:'numeric',month:'long',year:'numeric'});}
+function bahtText(n){
+  const d=['ศูนย์','หนึ่ง','สอง','สาม','สี่','ห้า','หก','เจ็ด','แปด','เก้า'],u=['','สิบ','ร้อย','พัน','หมื่น','แสน','ล้าน'];
+  const conv=s=>{let r='';const l=s.length;for(let i=0;i<l;i++){const c=+s[i],p=l-i-1;if(!c)continue;
+    if(p===1&&c===2)r+='ยี่';else if(p===1&&c===1);else if(p===0&&c===1&&l>1)r+='เอ็ด';else r+=d[c];r+=u[p];}return r;};
+  const [b,s]=n.toFixed(2).split('.');
+  if(+b===0&&+s===0)return 'ศูนย์บาทถ้วน';
+  return (+b?conv(String(+b))+'บาท':'')+(+s?conv(String(+s))+'สตางค์':'ถ้วน');
+}
+
+/* ---------- build forms ---------- */
+const fld=(id,l,t='text',cls='',ph='')=>`<div class="${cls}"><label for="${id}">${l}</label><input id="${id}" type="${t}" ${t==='number'?'inputmode="decimal" min="0"':''} placeholder="${ph}"></div>`;
+const sel=(id,l,arr,cls)=>`<div class="${cls}"><label for="${id}">${l}</label><select id="${id}">${arr.map(h=>`<option>${esc(h)}</option>`).join('')}</select></div>`;
+const TM=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const opt=(v,t)=>`<option value="${v}">${t}</option>`;
+const dateFld=(id,l,cls)=>{const y=new Date().getFullYear();let d='',m='',yr='';
+  for(let i=1;i<=31;i++)d+=opt(i,i);TM.forEach((t,i)=>m+=opt(i+1,t));for(let i=y-5;i<=y+3;i++)yr+=opt(i,i+543);
+  return `<div class="${cls}"><label>${l}</label><div id="${id}Box" style="display:flex;gap:6px"><select aria-label="วัน" style="flex:.7">${d}</select><select aria-label="เดือน" style="flex:1.6">${m}</select><select aria-label="ปี พ.ศ." style="flex:1">${yr}</select></div><input id="${id}" type="hidden"></div>`;};
+$('pGrid').innerHTML=
+  fld('lName','ชื่อกิจการ / ชื่อที่แสดงหัวใบเสร็จ','text','full','เช่น บ้านเรือนแก้ว')+
+  fld('lOwner','ชื่อเจ้าของ','text','full')+
+  fld('lAddr','ที่อยู่','text','full')+
+  fld('lTax','เลขประจำตัวผู้เสียภาษี','text','h2')+
+  fld('bank','ธนาคาร / เลขบัญชี','text','h2','เช่น กรุงไทย 000-0-00000-0')+
+  `<div class="h2"><label for="signF">ลายเซ็น (พื้นหลังโปร่งใสจะสวยกว่า) <span id="signSt"></span></label><input id="signF" type="file" accept="image/*"></div>`;
+$('rGrid').innerHTML=
+  `<div class="group">ใบเสร็จ</div>`+
+  sel('house','ชื่อบ้านพัก',HOUSES,'h2')+fld('room','ห้องหมายเลข','text','h2')+
+  fld('hAddr','ที่อยู่บ้านพัก (จำไว้ให้แต่ละหลัง)','text','full')+
+  dateFld('issueDate','วันที่ออกใบเสร็จ','full')+
+  `<div class="group">ผู้เช่า</div>`+
+  fld('tName','ชื่อผู้เช่า / บริษัท','text','full')+fld('tAddr','ที่อยู่ผู้เช่า','text','full')+fld('tTax','เลขประจำตัวผู้เสียภาษีผู้เช่า','text','full')+
+  `<div class="group">ค่าเช่าและสาธารณูปโภค</div>`+
+  fld('rent','ค่าห้อง (บาท)','number','full')+
+  `<label class="full" style="display:flex;gap:8px;align-items:center;color:var(--ink);font-size:1rem"><input id="flat" type="checkbox" style="width:auto"> เหมาค่าน้ำ-ไฟ (ติ๊กแล้วไม่คิดตามมิเตอร์ และไม่แสดงในใบเสร็จ)</label>`+
+  fld('wPrev','น้ำ เลขครั้งก่อน','number')+fld('wCurr','น้ำ เลขครั้งนี้','number')+fld('wRate','น้ำ บาท/หน่วย','number')+fld('wMin','น้ำ ขั้นต่ำ (บาท)','number')+
+  fld('ePrev','ไฟ เลขครั้งก่อน','number')+fld('eCurr','ไฟ เลขครั้งนี้','number')+fld('eRate','ไฟ บาท/หน่วย','number')+fld('eMin','ไฟ ขั้นต่ำ (บาท)','number')+
+  fld('gRate','ค่าขยะ (บาท/เดือน)','number','h2')+fld('oName','รายการอื่น ๆ','text','h2')+fld('oAmt','จำนวนเงินอื่น ๆ (บาท)','number','h2')+
+  `<div class="group">การชำระเงิน</div>`+
+  sel('method','ชำระโดย',METHODS,'h2')+dateFld('paidDate','วันที่รับเงิน','h2')+fld('rcvName','ชื่อผู้รับเงิน (เว้นว่าง = ใช้ชื่อเจ้าของ)','text','full')+fld('note','หมายเหตุ','text','full');
+
+/* ---------- storage ---------- */
+function put(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){return false;}}
+function get(k,d){try{const r=localStorage.getItem(k);return r?JSON.parse(r):d;}catch(e){return d;}}
+const saveP=()=>{PF.forEach(f=>P[f]=$(f).value);return put(PK,P);};
+function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3500);}
+function setStatus(t,ok){const s=$('status');s.textContent=t;s.style.color=ok?'var(--ok)':'var(--danger)';}
+
+/* ---------- receipt ---------- */
+function makeNo(){const d=($('issueDate').value||'').replace(/-/g,'').slice(2,6);return 'RC'+(d||'0000')+'-'+String(history.length+1).padStart(3,'0');}
+function calc(){
+  const wU=Math.max(0,num('wCurr')-num('wPrev')),eU=Math.max(0,num('eCurr')-num('ePrev'));
+  const wA=Math.max(wU*num('wRate'),num('wMin')),eA=Math.max(eU*num('eRate'),num('eMin'));
+  const rows=[{n:'ค่าห้อง',a:num('rent')}];
+  if(!$('flat').checked){
+    rows.push({n:'ค่าน้ำ'+(num('wMin')?` (ขั้นต่ำ ${num('wMin')} บาท)`:''),p:val('wPrev')||0,c:val('wCurr')||0,u:wU,r:num('wRate'),a:wA});
+    rows.push({n:'ค่าไฟ'+(num('eMin')?` (ขั้นต่ำ ${num('eMin')} บาท)`:''),p:val('ePrev')||0,c:val('eCurr')||0,u:eU,r:num('eRate'),a:eA});
+  }
+  rows.push({n:'ค่าขยะ',p:'-',c:'-',u:1,r:num('gRate'),a:num('gRate')});
+  rows.push({n:val('oName')||'อื่น ๆ',a:num('oAmt')});
+  return {rows,total:rows.reduce((s,r)=>s+r.a,0)};
+}
+function render(){
+  ['wPrev','wCurr','wRate','wMin','ePrev','eCurr','eRate','eMin'].forEach(id=>$(id).disabled=$('flat').checked);
+  const {rows,total}=calc();
+  const tr=rows.map((r,i)=>{const has=r.a>0||r.u!==undefined;
+    return `<tr><td>${i+1}</td><td class="l">${esc(r.n)}</td><td>${r.p!==undefined?esc(r.p):''}</td><td>${r.c!==undefined?esc(r.c):''}</td><td>${r.u!==undefined?r.u:''}</td><td>${r.r!==undefined?r.r:''}</td><td class="r">${r.a>0?fmt(r.a):''}</td></tr>`;}).join('');
+  const L=(x)=>x?`<div>${x}</div>`:'';
+  $('receipt').innerHTML=`
+  <div class="bar"><span>ใบเสร็จรับเงิน (ต้นฉบับ)</span></div>
+  <div class="top"><div><b>${esc(val('lName')||'ชื่อกิจการ')}</b>
+    ${L(esc(val('lOwner')))}${L(esc(val('lAddr')))}${val('lTax')?`<div>เลขประจำตัวผู้เสียภาษี ${esc(val('lTax'))}</div>`:''}</div>
+    </div>
+  <div class="mid"><div><b>${esc(val('tName')||'ชื่อผู้เช่า')}</b>
+    ${L(esc(val('tAddr')))}${val('tTax')?`<div>เลขประจำตัวผู้เสียภาษี ${esc(val('tTax'))}</div>`:''}</div>
+    <div class="rt"><div><b>เลขที่</b><span>${esc(currentNo||makeNo())}</span><b>วันที่</b><span>${esc(thDate($('issueDate').value))}</span></div>
+    <div><b>ชื่อบ้านพัก</b><span>${esc($('house').value.split(' (')[0])}</span><b>ห้องหมายเลข</b><span>${esc(val('room'))}</span></div>
+    <div><b>ที่อยู่</b><span>${esc(val('hAddr'))}</span></div></div></div>
+  <table><thead><tr><th style="width:6%">ลำดับ</th><th class="l" style="width:29%">รายการ</th><th style="width:11%">เลขครั้งก่อน</th><th style="width:11%">เลขครั้งนี้</th><th style="width:11%">จำนวนหน่วย</th><th style="width:11%">ราคาต่อหน่วย</th><th class="r" style="width:21%">จำนวนเงิน<br>(บาท)</th></tr></thead>
+  <tbody>${tr}</tbody>
+  <tfoot><tr><td colspan="2" class="l">รวม</td><td colspan="4" class="l" style="font-weight:400">(${esc(bahtText(total))})</td><td class="r">${fmt(total)}</td></tr></tfoot></table>
+  <div class="ft"><div><div><b>ชำระโดย</b><span>${esc($('method').value)}</span>${val('bank')&&$('method').value!=='เงินสด'?`<b>ธนาคาร :</b><span>${esc(val('bank'))}</span>`:''}<b>วันที่</b><span>${esc(thDate($('paidDate').value))}</span></div>
+    <div><b>หมายเหตุ</b><span>${esc(val('note'))}</span></div></div>
+    <div class="sg">${okImg(P.sign)?`<img src="${P.sign}" alt="">`:'<div style="height:30px;border:0"></div>'}<div>(${esc(val('rcvName')||val('lOwner'))})<br>ผู้ออกรายการ</div></div></div>`;
+  fit();
+}
+function fit(){const w=$('fit'),r=$('receipt'),s=Math.min(1.8,w.clientWidth/r.offsetWidth);r.style.transform=`scale(${s})`;w.style.height=(r.offsetHeight*s)+'px';}
+addEventListener('resize',fit);
+
+/* ---------- form logic ---------- */
+function today(){const t=new Date();return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');}
+function houseAddr(){$('hAddr').value=(P.houses&&P.houses[$('house').value])||'';}
+function resetForm(){
+  RF.forEach(f=>{const el=$(f);if(el.type==='checkbox')el.checked=false;else if(el.tagName==='SELECT')el.selectedIndex=0;else el.value=el.type==='number'?String(DEF[f]??0):'';});
+  $('issueDate').value=$('paidDate').value=today();syncDates();houseAddr();currentNo='';render();
+}
+const snap=()=>{const o={};RF.forEach(f=>o[f]=$(f).type==='checkbox'?$(f).checked:$(f).value);return o;};
+const load=o=>{RF.forEach(f=>{if(o[f]===undefined)return;if($(f).type==='checkbox')$(f).checked=!!o[f];else $(f).value=o[f];});syncDates();};
+RF.forEach(f=>$(f).addEventListener('input',render));
+const DATES=['issueDate','paidDate'];
+function syncDates(){DATES.forEach(id=>{const [y,m,d]=($(id).value||today()).split('-').map(Number),c=$(id+'Box').children;
+  if(![...c[2].options].some(o=>+o.value===y))c[2].insertAdjacentHTML('beforeend',opt(y,y+543));
+  c[0].value=d;c[1].value=m;c[2].value=y;});}
+DATES.forEach(id=>[...$(id+'Box').children].forEach(el=>el.addEventListener('change',()=>{
+  const c=$(id+'Box').children,y=+c[2].value,m=+c[1].value,d=Math.min(+c[0].value,new Date(y,m,0).getDate());
+  c[0].value=d;$(id).value=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');render();})));
+$('house').addEventListener('change',()=>{houseAddr();render();});
+$('hAddr').addEventListener('input',()=>{P.houses=P.houses||{};P.houses[$('house').value]=$('hAddr').value;put(PK,P);});
+PF.forEach(f=>$(f).addEventListener('input',()=>{saveP();render();}));
+
+function readImg(file,maxW,cb){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,maxW/im.width),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/png'));};im.src=r.result;};r.readAsDataURL(file);}
+function imgStatus(){$('signSt').textContent=okImg(P.sign)?'✓ อัปโหลดแล้ว':'';}
+[['signF','sign',300]].forEach(([id,key,w])=>$(id).addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;
+  readImg(f,w,d=>{P[key]=d;const ok=put(PK,P);imgStatus();render();if(!ok)toast('เก็บรูปถาวรไม่ได้ ใช้ได้จนกว่าจะปิดหน้า');});
+}));
+
+/* ---------- tabs, save, history ---------- */
+function show(tab){const n=tab==='new';
+  $('view-new').classList.toggle('hidden',!n);$('view-hist').classList.toggle('hidden',n);
+  $('tabNew').setAttribute('aria-selected',n);$('tabHist').setAttribute('aria-selected',!n);
+  if(n)fit();else renderHist();}
+function renderHist(){
+  const ul=$('histList');
+  if(!history.length){ul.innerHTML='<li class="empty" style="display:block">ยังไม่มีใบเสร็จ</li>';return;}
+  ul.innerHTML=history.slice().reverse().map(h=>`<li><button class="open" data-no="${esc(h.no)}"><strong>${esc(h.no)}</strong> · ${esc(h.data.house.split(' (')[0])} ห้อง ${esc(h.data.room||'-')}
+    <small>${esc(h.data.tName||'-')} · ${esc(thDate(h.data.issueDate))} · ${fmt(h.total)}</small></button>
+    <button class="btn del" data-del="${esc(h.no)}">ลบ</button></li>`).join('');
+}
+$('tabNew').onclick=()=>show('new');
+$('tabHist').onclick=()=>show('hist');
+$('print').onclick=()=>{try{window.print();}catch(e){toast('เบราว์เซอร์นี้ไม่รองรับการพิมพ์');}};
+async function download(kind){
+  const dls=window.claude?await window.claude.use('downloads'):null;
+  const save=dls?(o=>dls.save(o)):(async o=>{const a=document.createElement('a');a.href=URL.createObjectURL(o.data);a.download=o.filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);});
+  if(typeof html2canvas==='undefined'||(kind==='pdf'&&!window.jspdf)){setStatus('โหลดเครื่องมือสร้างไฟล์ไม่สำเร็จ ตรวจอินเทอร์เน็ตแล้วลองใหม่',false);return;}
+  setStatus('กำลังสร้างไฟล์...',true);
+  try{
+    await document.fonts.ready;
+    const c=await html2canvas($('receipt'),{scale:3,backgroundColor:'#fff',onclone:d=>{d.getElementById('receipt').style.transform='none';d.getElementById('fit').style.height='auto';}});
+    const base='receipt-'+(currentNo||makeNo());
+    if(kind==='png'){
+      const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+      await save({filename:base+'.png',data:blob});
+    }else{
+      const pdf=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:[105,148]});
+      pdf.addImage(c.toDataURL('image/jpeg',0.95),'JPEG',0,0,148,105);
+      await save({filename:base+'.pdf',data:pdf.output('blob')});
+    }
+    setStatus('ส่งไฟล์ให้บันทึกแล้ว',true);
+  }catch(e){setStatus(e&&e.code==='declined'?'ยกเลิกการบันทึก':'สร้างไฟล์ไม่สำเร็จ ลองใหม่อีกครั้ง หรือใช้ปุ่มพิมพ์',false);}
+}
+$('dlPdf').onclick=()=>download('pdf');
+$('dlPng').onclick=()=>download('png');
+$('reset').onclick=()=>{resetForm();setStatus('',true);};
+$('save').onclick=()=>{
+  if(!val('tName')){setStatus('บันทึกไม่ได้: กรุณากรอกชื่อผู้เช่าก่อน',false);$('tName').scrollIntoView({block:'center'});$('tName').focus();return;}
+  const no=currentNo||makeNo(),rec={no,data:snap(),total:calc().total},i=history.findIndex(h=>h.no===no);
+  if(i>=0)history[i]=rec;else history.push(rec);
+  currentNo=no;const ok=put(HK,history);render();
+  setStatus(ok?'บันทึกแล้ว: '+no+' (ดูได้ที่แท็บ ประวัติ)':'บันทึกชั่วคราว: '+no+' เบราว์เซอร์นี้เก็บข้อมูลถาวรไม่ได้ ข้อมูลจะหายเมื่อปิดหน้า',ok);
+  toast('บันทึกใบเสร็จแล้ว');
+};
+$('histList').addEventListener('click',e=>{
+  const o=e.target.closest('[data-no]'),d=e.target.closest('[data-del]');
+  if(o){const h=history.find(x=>x.no===o.dataset.no);if(h){load(h.data);currentNo=h.no;show('new');render();scrollTo(0,0);}}
+  if(d){history=history.filter(x=>x.no!==d.dataset.del);put(HK,history);renderHist();toast('ลบใบเสร็จแล้ว');}
+});
+
+/* ---------- init ---------- */
+history=get(HK,[]);P=Object.assign(P,DEFP,get(PK,{}));
+PF.forEach(f=>{if(P[f])$(f).value=P[f];});
+$('profile').open=!P.lName;
+imgStatus();resetForm();
+</script>
+</body>
+</html>
