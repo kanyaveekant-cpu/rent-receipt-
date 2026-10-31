@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ใบเสร็จรับเงินค่าเช่า</title>
+<title>ใบแจ้งหนี้ค่าเช่า</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai+Looped:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -71,9 +71,9 @@ input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visi
 </head>
 <body>
 <main>
-<h1>ใบเสร็จรับเงินค่าเช่า</h1>
+<h1>ใบแจ้งหนี้ค่าเช่า</h1>
 <div class="tabs" role="tablist">
-  <button role="tab" id="tabNew" aria-selected="true">ออกใบเสร็จ</button>
+  <button role="tab" id="tabNew" aria-selected="true">ออกใบแจ้งหนี้</button>
   <button role="tab" id="tabHist" aria-selected="false">ประวัติ</button>
 </div>
 
@@ -85,7 +85,7 @@ input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visi
   <div class="panel"><div class="grid" id="rGrid"></div></div>
   <div id="fit"><div class="rc" id="receipt"></div></div>
   <div class="actions">
-    <button class="btn" id="save">บันทึกใบเสร็จ</button>
+    <button class="btn" id="save">บันทึกใบแจ้งหนี้</button>
     <button class="btn alt" id="dlPdf">ดาวน์โหลด PDF</button>
     <button class="btn alt" id="dlPng">ดาวน์โหลดรูป PNG</button>
     <button class="btn alt" id="print">พิมพ์</button>
@@ -95,7 +95,7 @@ input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visi
 </section>
 
 <section id="view-hist" class="hidden">
-  <div class="panel"><h2 style="margin:0 0 8px">ใบเสร็จที่บันทึกไว้</h2><ul class="hist" id="histList"></ul></div>
+  <div class="panel"><h2 style="margin:0 0 8px">ใบแจ้งหนี้ที่บันทึกไว้</h2><ul class="hist" id="histList"></ul></div>
 </section>
 </main>
 <div class="toast" id="toast" role="status"></div>
@@ -135,17 +135,17 @@ const dateFld=(id,l,cls)=>{const y=new Date().getFullYear();let d='',m='',yr='';
   for(let i=1;i<=31;i++)d+=opt(i,i);TM.forEach((t,i)=>m+=opt(i+1,t));for(let i=y-5;i<=y+3;i++)yr+=opt(i,i+543);
   return `<div class="${cls}"><label>${l}</label><div id="${id}Box" style="display:flex;gap:6px"><select aria-label="วัน" style="flex:.7">${d}</select><select aria-label="เดือน" style="flex:1.6">${m}</select><select aria-label="ปี พ.ศ." style="flex:1">${yr}</select></div><input id="${id}" type="hidden"></div>`;};
 $('pGrid').innerHTML=
-  fld('lName','ชื่อกิจการ / ชื่อที่แสดงหัวใบเสร็จ','text','full','เช่น บ้านเรือนแก้ว')+
+  fld('lName','ชื่อกิจการ / ชื่อที่แสดงหัวใบแจ้งหนี้','text','full','เช่น บ้านเรือนแก้ว')+
   fld('lOwner','ชื่อเจ้าของ','text','full')+
   fld('lAddr','ที่อยู่','text','full')+
   fld('lTax','เลขประจำตัวผู้เสียภาษี','text','h2')+
   fld('bank','ธนาคาร / เลขบัญชี','text','h2','เช่น กรุงไทย 000-0-00000-0')+
   `<div class="h2"><label for="signF">ลายเซ็น (พื้นหลังโปร่งใสจะสวยกว่า) <span id="signSt"></span></label><input id="signF" type="file" accept="image/*"></div>`;
 $('rGrid').innerHTML=
-  `<div class="group">ใบเสร็จ</div>`+
+  `<div class="group">ใบแจ้งหนี้</div>`+
   `<div class="h2"><label for="house">ชื่อบ้านพัก (พิมพ์เอง)</label><input id="house" list="houseList" placeholder="พิมพ์ชื่อบ้านพัก" autocomplete="off"><datalist id="houseList"></datalist></div>`+fld('room','ห้องหมายเลข','text','h2')+
   fld('hAddr','ที่อยู่บ้านพัก (จำไว้ให้แต่ละหลัง)','text','full')+
-  dateFld('issueDate','วันที่ออกใบเสร็จ','full')+
+  dateFld('issueDate','วันที่ออกใบแจ้งหนี้','full')+
   `<div class="group">ผู้เช่า</div>`+
   fld('tName','ชื่อผู้เช่า / บริษัท','text','full')+fld('tAddr','ที่อยู่ผู้เช่า','text','full')+fld('tTax','เลขประจำตัวผู้เสียภาษีผู้เช่า','text','full')+
   `<div class="group">ค่าเช่าและสาธารณูปโภค</div>`+
@@ -166,7 +166,7 @@ function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');
 function setStatus(t,ok){const s=$('status');s.textContent=t;s.style.color=ok?'var(--ok)':'var(--danger)';}
 
 /* ---------- receipt ---------- */
-function makeNo(){const d=($('issueDate').value||'').replace(/-/g,'').slice(2,6);return 'RC'+(d||'0000')+'-'+String(history.length+1).padStart(3,'0');}
+function makeNo(){const d=($('issueDate').value||'').replace(/-/g,'').slice(2,6);return 'INV'+(d||'0000')+'-'+String(history.length+1).padStart(3,'0');}
 function calc(){
   const fl=$('flat').checked;
   const wU=Math.max(0,num('wCurr')-num('wPrev')),eU=Math.max(0,num('eCurr')-num('ePrev'));
@@ -194,13 +194,13 @@ function render(){
     return `<tr><td>${i+1}</td><td class="l">${esc(r.n)}</td><td>${r.p!==undefined?esc(r.p):''}</td><td>${r.c!==undefined?esc(r.c):''}</td><td>${r.u!==undefined?r.u:''}</td><td>${r.r!==undefined?r.r:''}</td><td class="r">${r.a>0?fmt(r.a):''}</td></tr>`;}).join('');
   const L=(x)=>x?`<div>${x}</div>`:'';
   $('receipt').innerHTML=`
-  <div class="bar"><span>ใบเสร็จรับเงิน (ต้นฉบับ)</span></div>
+  <div class="bar"><span>ใบแจ้งหนี้ (ต้นฉบับ)</span></div>
   <div class="top"><div><b>${esc(val('lName')||'ชื่อกิจการ')}</b>
     ${L(esc(val('lOwner')))}${L(esc(val('lAddr')))}${val('lTax')?`<div>เลขประจำตัวผู้เสียภาษี ${esc(val('lTax'))}</div>`:''}</div>
     </div>
   <div class="mid"><div><b>${esc(val('tName')||'ชื่อผู้เช่า')}</b>
     ${L(esc(val('tAddr')))}${val('tTax')?`<div>เลขประจำตัวผู้เสียภาษี ${esc(val('tTax'))}</div>`:''}</div>
-    <div class="rt"><div><b>เลขที่</b><span>${esc(currentNo||makeNo())}</span><b>วันที่</b><span>${esc(thDate($('issueDate').value))}</span></div>
+    <div class="rt"><div><b>วันที่</b><span>${esc(thDate($('issueDate').value))}</span></div>
     <div><b>ชื่อบ้านพัก</b><span>${esc(val('house'))}</span><b>ห้องหมายเลข</b><span>${esc(val('room'))}</span></div>
     <div><b>ที่อยู่</b><span>${esc(val('hAddr'))}</span></div></div></div>
   <table><thead><tr><th style="width:6%">ลำดับ</th><th class="l" style="width:29%">รายการ</th><th style="width:11%">เลขครั้งก่อน</th><th style="width:11%">เลขครั้งนี้</th><th style="width:11%">จำนวนหน่วย</th><th style="width:11%">ราคาต่อหน่วย</th><th class="r" style="width:21%">จำนวนเงิน<br>(บาท)</th></tr></thead>
@@ -250,7 +250,7 @@ function show(tab){const n=tab==='new';
   if(n)fit();else renderHist();}
 function renderHist(){
   const ul=$('histList');
-  if(!history.length){ul.innerHTML='<li class="empty" style="display:block">ยังไม่มีใบเสร็จ</li>';return;}
+  if(!history.length){ul.innerHTML='<li class="empty" style="display:block">ยังไม่มีใบแจ้งหนี้</li>';return;}
   ul.innerHTML=history.slice().reverse().map(h=>`<li><button class="open" data-no="${esc(h.no)}"><strong>${esc(h.no)}</strong> · ${esc(h.data.house||'-')} ห้อง ${esc(h.data.room||'-')}
     <small>${esc(h.data.tName||'-')} · ${esc(thDate(h.data.issueDate))} · ${fmt(h.total)}</small></button>
     <button class="btn del" data-del="${esc(h.no)}">ลบ</button></li>`).join('');
@@ -266,7 +266,7 @@ async function download(kind){
   try{
     await document.fonts.ready;
     const c=await html2canvas($('receipt'),{scale:3,backgroundColor:'#fff',onclone:d=>{d.getElementById('receipt').style.transform='none';d.getElementById('fit').style.height='auto';}});
-    const base='receipt-'+(currentNo||makeNo());
+    const base='invoice-'+(currentNo||makeNo());
     if(kind==='png'){
       const blob=await new Promise(r=>c.toBlob(r,'image/png'));
       await save({filename:base+'.png',data:blob});
@@ -287,12 +287,12 @@ $('save').onclick=()=>{
   if(i>=0)history[i]=rec;else history.push(rec);
   currentNo=no;const ok=put(HK,history);render();
   setStatus(ok?'บันทึกแล้ว: '+no+' (ดูได้ที่แท็บ ประวัติ)':'บันทึกชั่วคราว: '+no+' เบราว์เซอร์นี้เก็บข้อมูลถาวรไม่ได้ ข้อมูลจะหายเมื่อปิดหน้า',ok);
-  toast('บันทึกใบเสร็จแล้ว');
+  toast('บันทึกใบแจ้งหนี้แล้ว');
 };
 $('histList').addEventListener('click',e=>{
   const o=e.target.closest('[data-no]'),d=e.target.closest('[data-del]');
   if(o){const h=history.find(x=>x.no===o.dataset.no);if(h){load(h.data);currentNo=h.no;show('new');render();scrollTo(0,0);}}
-  if(d){history=history.filter(x=>x.no!==d.dataset.del);put(HK,history);renderHist();toast('ลบใบเสร็จแล้ว');}
+  if(d){history=history.filter(x=>x.no!==d.dataset.del);put(HK,history);renderHist();toast('ลบใบแจ้งหนี้แล้ว');}
 });
 
 /* ---------- init ---------- */
